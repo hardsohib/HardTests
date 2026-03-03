@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Services</title>
+
+<style>
+:root{
+  --bg:#0f172a;
+  --card:#111827;
+  --accent:#00f5a0;
+  --accent2:#00d9ff;
+  --text:#e6faff;
+  --muted:rgba(230,250,255,.65);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:system-ui,Segoe UI,Roboto;
+  background:
+    radial-gradient(800px 500px at 70% 10%, rgba(0,245,160,.06), transparent 60%),
+    radial-gradient(700px 500px at 20% 90%, rgba(0,217,255,.06), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+.wrap{
+  width:min(1200px,100%);
+  margin:auto;
+  padding:20px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:30px;
+}
+
+.balance{
+  padding:10px 18px;
+  border-radius:16px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  color:#000;
+  font-weight:900;
+}
+
+.cards{
+  display:flex;
+  gap:25px;
+  flex-wrap:wrap;
+}
+
+.tile{
+  flex:1 1 280px;
+  background:var(--card);
+  padding:20px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.08);
+  transition:.25s;
+}
+
+.tile:hover{
+  transform:translateY(-4px);
+  box-shadow:0 25px 60px rgba(0,0,0,.5);
+}
+
+.title{
+  font-size:20px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.sub{
+  font-size:14px;
+  color:var(--muted);
+  margin-bottom:14px;
+}
+
+.buyBtn{
+  padding:10px;
+  border:none;
+  border-radius:14px;
+  font-weight:900;
+  cursor:pointer;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  color:#000;
+  width:100%;
+}
+
+.logout{
+  cursor:pointer;
+  font-size:14px;
+  color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div>
+      <h2>Services</h2>
+      <div class="logout" onclick="logout()">Logout</div>
+    </div>
+    <div class="balance">
+      Balance: <span id="balanceValue">0</span> UZS
+    </div>
+  </div>
+
+  <div class="cards" id="servicesContainer"></div>
+
+</div>
+
+<script>
+const API_BASE = "https://YOUR_RENDER_BACKEND_URL.onrender.com";
+const token = localStorage.getItem("token");
+
+if(!token){
+  window.location.replace("./index.html");
+}
+
+// ---------- Fetch Profile ----------
+async function loadProfile(){
+  const res = await fetch(API_BASE + "/api/user/me",{
+    headers:{ Authorization:"Bearer " + token }
+  });
+
+  if(res.status === 401){
+    logout();
+    return;
+  }
+
+  const data = await res.json();
+  document.getElementById("balanceValue").innerText =
+    Number(data.balance).toLocaleString("en-US");
+}
+
+// ---------- Fetch Services ----------
+async function loadServices(){
+  const res = await fetch(API_BASE + "/api/services",{
+    headers:{ Authorization:"Bearer " + token }
+  });
+
+  const services = await res.json();
+  const container = document.getElementById("servicesContainer");
+  container.innerHTML = "";
+
+  services.forEach(service=>{
+    const div = document.createElement("div");
+    div.className = "tile";
+    div.innerHTML = `
+      <div class="title">${service.name}</div>
+      <div class="sub">${service.description || ""}</div>
+      <button class="buyBtn">
+        ${Number(service.price).toLocaleString("en-US")} UZS
+      </button>
+    `;
+
+    div.querySelector(".buyBtn").addEventListener("click",()=>{
+      purchaseService(service);
+    });
+
+    container.appendChild(div);
+  });
+}
+
+// ---------- Purchase ----------
+async function purchaseService(service){
+
+  if(service.requires_horizontal){
+    if(window.innerHeight > window.innerWidth){
+      alert("Please rotate your phone horizontally.");
+      return;
+    }
+  }
+
+  const confirmBuy = confirm(
+    `Buy "${service.name}" for ${service.price} UZS?`
+  );
+
+  if(!confirmBuy) return;
+
+  const res = await fetch(API_BASE + "/api/services/purchase",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:"Bearer " + token
+    },
+    body:JSON.stringify({
+      service_id: service.id
+    })
+  });
+
+  const data = await res.json();
+
+  if(res.ok){
+    alert("Purchase successful!");
+    loadProfile();
+  }else{
+    alert(data.message || "Not enough balance.");
+  }
+}
+
+// ---------- Logout ----------
+function logout(){
+  localStorage.removeItem("token");
+  window.location.replace("./index.html");
+}
+
+// ---------- Init ----------
+loadProfile();
+loadServices();
+</script>
+
+</body>
+</html>
