@@ -135,14 +135,14 @@ async function loadProfile(){
     headers:{ Authorization:"Bearer " + token }
   });
 
-  if(res.status === 401){
-    logout();
-    return;
-  }
-
   const data = await res.json();
+
   document.getElementById("balanceValue").innerText =
     Number(data.balance).toLocaleString("en-US");
+
+  // 🔥 SET CHECKBOX STATE
+  document.getElementById("notifCheckbox").checked =
+    data.receive_notifications;
 }
 
 // ---------- Fetch Services ----------
@@ -250,6 +250,21 @@ loadServices();
     alert(data.message);
   }
 }
+  document.getElementById("notifCheckbox")
+  .addEventListener("change", async function(){
+
+    await fetch(API_BASE + "/api/user/update-notif",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        Authorization:"Bearer " + token
+      },
+      body:JSON.stringify({
+        receive_notifications: this.checked
+      })
+    });
+
+});
 </script>
 
 </body>
