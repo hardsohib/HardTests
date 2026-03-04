@@ -104,7 +104,7 @@ body{
 
 <div class="wrap">
 
-  <div class="topbar">
+  <div class="topbar"><button onclick="createDeposit()">Deposit</button>
     <div>
       <h2>Services</h2>
      
@@ -214,6 +214,39 @@ async function purchaseService(service){
 // ---------- Init ----------
 loadProfile();
 loadServices();
+  async function createDeposit(){
+
+  const amount = prompt("Enter deposit amount (UZS)");
+
+  if(!amount) return;
+
+  const res = await fetch(API_BASE + "/api/deposit/create",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:"Bearer " + token
+    },
+    body:JSON.stringify({
+      amount:Number(amount)
+    })
+  });
+
+  const data = await res.json();
+
+  if(res.ok){
+    alert("Deposit created (test mode). Now confirming...");
+    
+    // Simulate payment success
+    await fetch(API_BASE + "/api/deposit/confirm/" + data.transaction_id,{
+      method:"POST"
+    });
+
+    alert("Deposit confirmed!");
+    loadProfile();
+  }else{
+    alert(data.message);
+  }
+}
 </script>
 
 </body>
