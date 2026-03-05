@@ -13,24 +13,72 @@ body{
   padding:20px;
 }
 
-.card{
-  background:#111827;
-  border-radius:20px;
-  padding:20px;
+h2{
   margin-bottom:20px;
+}
+
+.resultItem{
+  background:#111827;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+  transition:0.25s;
   border:1px solid rgba(255,255,255,.08);
+}
+
+.resultItem:hover{
+  transform:translateY(-3px);
+}
+
+.status{
+  padding:6px 12px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.pending{
+  background:#ffb020;
+  color:#000;
+}
+
+.completed{
+  background:#00f5a0;
+  color:#000;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.modalContent{
+  background:#111827;
+  padding:24px;
+  border-radius:20px;
+  width:90%;
+  max-width:400px;
+  animation:fadeIn .3s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:scale(.9);}
+  to{opacity:1; transform:scale(1);}
 }
 
 .score{
   font-size:32px;
   font-weight:900;
   color:#00f5a0;
-}
-
-.date{
-  font-size:12px;
-  opacity:.6;
-  margin-bottom:10px;
+  margin:10px 0;
 }
 </style>
 </head>
@@ -38,11 +86,22 @@ body{
 <body>
 
 <h2>📊 My Results</h2>
+
 <div id="resultsContainer"></div>
+
+<div class="modal" id="modal">
+  <div class="modalContent">
+    <div id="modalContent"></div>
+    <br>
+    <button onclick="closeModal()">Close</button>
+  </div>
+</div>
 
 <script>
 const API_BASE = "https://your-backend.onrender.com";
 const token = localStorage.getItem("token");
+
+let allResults = [];
 
 async function loadResults(){
   const res = await fetch(API_BASE + "/api/results/my",{
@@ -50,6 +109,8 @@ async function loadResults(){
   });
 
   const data = await res.json();
+  allResults = data;
+
   const container = document.getElementById("resultsContainer");
   container.innerHTML = "";
 
@@ -60,14 +121,35 @@ async function loadResults(){
 
   data.forEach(r=>{
     container.innerHTML += `
-      <div class="card">
-        <div class="date">${new Date(r.created_at).toLocaleString()}</div>
-        <div><b>${r.name}</b></div>
-        <div class="score">Band ${r.score}</div>
-        <p>${r.feedback}</p>
+      <div class="resultItem" onclick="openResult(${r.id})">
+        <div>${r.name}</div>
+        <div class="status ${r.status}">
+          ${r.status}
+        </div>
       </div>
     `;
   });
+}
+
+function openResult(id){
+  const result = allResults.find(r=>r.id === id);
+
+  if(result.status === "pending"){
+    document.getElementById("modalContent").innerHTML =
+      "<h3>⏳ Test is being checked</h3>";
+  }else{
+    document.getElementById("modalContent").innerHTML = `
+      <h3>${result.name}</h3>
+      <div class="score">Band ${result.score}</div>
+      <p>${result.feedback}</p>
+    `;
+  }
+
+  document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display = "none";
 }
 
 loadResults();
