@@ -155,7 +155,7 @@ async function loadProfile(){
 
   const user=await res.json();
 
-  const link=`https://t.me/YOUR_BOT_USERNAME?start=${user.referral_code}`;
+  const link=`https://t.me/hard_tests_bot?start=${user.referral_code}`;
 
   navigator.clipboard.writeText(link);
   alert("Referral link copied!");
