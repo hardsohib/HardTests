@@ -123,8 +123,7 @@ body{
         onclick="window.location='admin.html'">
 🛠 Admin Panel
 </button>
-    <button onclick="openReferral()">💰 Referral Earnings</button>
-    <button onclick="copyReferral()">Invite & Earn 10%</button>
+ 
     <div>
       <h2>Services</h2>
      
@@ -145,18 +144,7 @@ const token = localStorage.getItem("token");
 if(!token){
   window.location.replace("./index.html");
 }
-async function openReferral(){
 
-  const res = await fetch(API_BASE + "/api/user/referral-stats",{
-    headers:{ Authorization:"Bearer " + token }
-  });
-
-  const data = await res.json();
-
-  alert(
-    `Referral Users: ${data.users}\n\nTotal Earned: ${Number(data.earned).toLocaleString()} UZS`
-  );
-}
 // ---------- Fetch Profile ----------
 async function loadProfile(){
   const res = await fetch(API_BASE + "/api/user/me",{
