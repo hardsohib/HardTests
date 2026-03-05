@@ -68,7 +68,7 @@ button:hover{
 </head>
 
 <body>
-
+<button onclick="goBack()">⬅ Back</button>
 <h2>🛠 Admin Dashboard</h2>
 
 <div id="pendingContainer"></div>
@@ -81,7 +81,9 @@ const token = localStorage.getItem("token");
 if(!token){
   window.location = "index.html";
 }
-
+function goBack(){
+  window.location = "services.html";
+}
 async function loadPending(){
 
   const res = await fetch(API_BASE + "/api/results/admin/pending",{
