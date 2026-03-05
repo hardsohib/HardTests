@@ -99,7 +99,24 @@ body{
 }
 </style>
 </head>
-<button onclick="loadResults()">📊 Check My Results</button>
+<div style="position:relative; display:inline-block;">
+  <button onclick="window.location='results.html'">
+    📊 Check My Results
+  </button>
+  <span id="resultBadge"
+        style="
+          position:absolute;
+          top:-5px;
+          right:-5px;
+          background:red;
+          color:#fff;
+          font-size:11px;
+          padding:3px 7px;
+          border-radius:50%;
+          display:none;
+        ">
+  </span>
+</div>
   Receive messages from admin
 </label>
 <body>
