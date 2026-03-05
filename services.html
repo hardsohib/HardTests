@@ -264,6 +264,29 @@ loadServices();
     });
 
 });
+  async function loadResults(){
+
+  const res = await fetch(API_BASE + "/api/results/my",{
+    headers:{
+      Authorization:"Bearer " + token
+    }
+  });
+
+  const data = await res.json();
+
+  if(data.length === 0){
+    alert("No results yet.");
+    return;
+  }
+
+  let message = "Your Results:\n\n";
+
+  data.forEach(r=>{
+    message += `${r.name}\nScore: ${r.score}\n${r.feedback}\n\n`;
+  });
+
+  alert(message);
+}
 </script>
 
 </body>
