@@ -198,19 +198,23 @@ h2{
 <div class="wrap">
 
   <div class="topbar">
+
+  <div class="leftSide">
     <h2>Services</h2>
+  </div>
 
-    <div class="rightSide">
+  <div class="rightSide">
 
-      <div class="balanceBox">
-        <button class="depositBtn" onclick="createDeposit()">+</button>
-        <div class="balance">
-          <span id="balanceValue">0</span> UZS
-        </div>
+    <div class="balanceBox">
+      <button class="depositBtn" onclick="createDeposit()">+</button>
+      <div class="balance">
+        <span id="balanceValue">0</span> UZS
       </div>
+    </div>
 
+    <div class="iconButtons">
       <div class="resultWrapper">
-        <button class="secondaryBtn"
+        <button class="iconBtn"
                 onclick="window.location.href='results.html'">
           📊
         </button>
@@ -218,14 +222,16 @@ h2{
       </div>
 
       <button id="adminBtn"
-              class="secondaryBtn"
+              class="iconBtn"
               style="display:none;"
               onclick="window.location.href='admin.html'">
         🛠
       </button>
-
     </div>
+
   </div>
+
+</div>
 
   <div class="cards" id="servicesContainer"></div>
 
