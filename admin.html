@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Admin Dashboard</title>
+<title>Admin Panel</title>
 
 <style>
 body{
@@ -13,7 +13,9 @@ body{
   padding:20px;
 }
 
-h2{margin-bottom:20px;}
+h2{
+  margin-bottom:20px;
+}
 
 .card{
   background:#111827;
@@ -21,24 +23,46 @@ h2{margin-bottom:20px;}
   padding:16px;
   margin-bottom:16px;
   border:1px solid rgba(255,255,255,.08);
+  transition:0.25s;
+}
+
+.card:hover{
+  transform:translateY(-3px);
 }
 
 input, textarea{
   width:100%;
-  padding:8px;
-  margin-top:6px;
+  padding:10px;
+  margin-top:8px;
   margin-bottom:10px;
-  border-radius:8px;
+  border-radius:10px;
   border:none;
+  outline:none;
+  font-size:14px;
+}
+
+textarea{
+  resize:none;
+  height:80px;
 }
 
 button{
-  padding:8px 12px;
+  padding:10px 14px;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
   cursor:pointer;
   background:#00f5a0;
   font-weight:bold;
+  transition:0.2s;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+.empty{
+  opacity:0.7;
+  margin-top:20px;
 }
 </style>
 </head>
@@ -50,20 +74,32 @@ button{
 <div id="pendingContainer"></div>
 
 <script>
-const API_BASE = "https://your-backend.onrender.com";
+const API_BASE = "https://beckend-bot-1.onrender.com"; // change if needed
 const token = localStorage.getItem("token");
 
+// 🔒 Require login
+if(!token){
+  window.location = "index.html";
+}
+
 async function loadPending(){
+
   const res = await fetch(API_BASE + "/api/results/admin/pending",{
     headers:{ Authorization:"Bearer " + token }
   });
+
+  if(!res.ok){
+    const err = await res.json();
+    alert(err.message);
+    return;
+  }
 
   const data = await res.json();
   const container = document.getElementById("pendingContainer");
   container.innerHTML = "";
 
   if(data.length === 0){
-    container.innerHTML = "<p>No pending tests.</p>";
+    container.innerHTML = "<div class='empty'>No pending tests.</div>";
     return;
   }
 
@@ -89,7 +125,12 @@ async function submitResult(resultId, userId, serviceId){
   const score = document.getElementById("score-"+resultId).value;
   const feedback = document.getElementById("feedback-"+resultId).value;
 
-  await fetch(API_BASE + "/api/results/admin/add",{
+  if(!score || !feedback){
+    alert("Score and feedback required");
+    return;
+  }
+
+  const res = await fetch(API_BASE + "/api/results/admin/add",{
     method:"POST",
     headers:{
       "Content-Type":"application/json",
@@ -103,7 +144,13 @@ async function submitResult(resultId, userId, serviceId){
     })
   });
 
-  alert("Result sent!");
+  if(!res.ok){
+    const err = await res.json();
+    alert(err.message);
+    return;
+  }
+
+  alert("✅ Result sent successfully!");
   loadPending();
 }
 
