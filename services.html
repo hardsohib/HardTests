@@ -292,18 +292,15 @@ loadServices();
 
   alert(message);
 }
-  async function loadUser(){
+async function loadUser(){
   const res = await fetch(API_BASE + "/api/user/me",{
     headers:{ Authorization:"Bearer " + token }
   });
 
   const user = await res.json();
 
-  document.getElementById("balance").innerText = user.balance;
-
-  // 🔥 show admin button
   if(user.is_admin){
-    document.getElementById("adminBtn").style.display = "block";
+    document.getElementById("adminBtn").style.display = "inline-block";
   }
 }
   loadUser();
