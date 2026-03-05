@@ -41,6 +41,15 @@ body{
   justify-content:space-between;
   align-items:center;
   margin-bottom:28px;
+  flex-wrap:wrap;
+  gap:15px;
+}
+
+.leftSide{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
 }
 
 h2{
@@ -49,10 +58,28 @@ h2{
   font-weight:800;
 }
 
+.iconBtn{
+  padding:8px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.1);
+  background:transparent;
+  color:var(--muted);
+  font-size:13px;
+  cursor:pointer;
+  transition:.25s;
+}
+
+.iconBtn:hover{
+  background:rgba(255,255,255,.05);
+  color:#fff;
+}
+
+/* ===== RIGHT SIDE ===== */
+
 .rightSide{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:8px;
 }
 
 .balanceBox{
@@ -86,24 +113,6 @@ h2{
   color:var(--primary-soft);
   font-weight:700;
   font-size:14px;
-}
-
-/* ===== BUTTONS ===== */
-
-.secondaryBtn{
-  padding:8px 12px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.1);
-  background:transparent;
-  color:var(--muted);
-  font-size:13px;
-  cursor:pointer;
-  transition:.25s;
-}
-
-.secondaryBtn:hover{
-  background:rgba(255,255,255,.05);
-  color:#fff;
 }
 
 /* ===== SERVICES ===== */
@@ -180,12 +189,24 @@ h2{
 /* ===== MOBILE ===== */
 
 @media(max-width:600px){
+
   h2{font-size:18px;}
+
+  .topbar{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .rightSide{
+    align-self:flex-end;
+  }
+
   .depositBtn{
     width:28px;
     height:28px;
     font-size:16px;
   }
+
   .balance{
     font-size:13px;
     padding:6px 12px;
@@ -199,24 +220,13 @@ h2{
 
   <div class="topbar">
 
-  <div class="leftSide">
-    <h2>Services</h2>
-  </div>
+    <div class="leftSide">
+      <h2>Services</h2>
 
-  <div class="rightSide">
-
-    <div class="balanceBox">
-      <button class="depositBtn" onclick="createDeposit()">+</button>
-      <div class="balance">
-        <span id="balanceValue">0</span> UZS
-      </div>
-    </div>
-
-    <div class="iconButtons">
       <div class="resultWrapper">
         <button class="iconBtn"
                 onclick="window.location.href='results.html'">
-          📊
+          📊 My Results
         </button>
         <span id="resultBadge"></span>
       </div>
@@ -225,13 +235,20 @@ h2{
               class="iconBtn"
               style="display:none;"
               onclick="window.location.href='admin.html'">
-        🛠
+        🛠 Admin Panel
       </button>
     </div>
 
-  </div>
+    <div class="rightSide">
+      <div class="balanceBox">
+        <button class="depositBtn" onclick="createDeposit()">+</button>
+        <div class="balance">
+          <span id="balanceValue">0</span> UZS
+        </div>
+      </div>
+    </div>
 
-</div>
+  </div>
 
   <div class="cards" id="servicesContainer"></div>
 
