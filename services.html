@@ -104,7 +104,11 @@ body{
 </label>
 <body>
 
-<div class="wrap">
+<div class="wrap"><button id="adminBtn"
+        style="display:none;"
+        onclick="window.location='admin.html'">
+🛠 Admin Panel
+</button>
 
   <div class="topbar"><button onclick="createDeposit()">Deposit</button>
     <div>
@@ -286,6 +290,20 @@ loadServices();
   });
 
   alert(message);
+}
+  async function loadUser(){
+  const res = await fetch(API_BASE + "/api/user/me",{
+    headers:{ Authorization:"Bearer " + token }
+  });
+
+  const user = await res.json();
+
+  document.getElementById("balance").innerText = user.balance;
+
+  // 🔥 show admin button
+  if(user.is_admin){
+    document.getElementById("adminBtn").style.display = "block";
+  }
 }
 </script>
 
