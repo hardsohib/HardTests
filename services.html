@@ -145,8 +145,7 @@ async function loadProfile(){
     Number(data.balance).toLocaleString("en-US");
 
   // 🔥 SET CHECKBOX STATE
-  document.getElementById("notifCheckbox").checked =
-    data.receive_notifications;
+
 }
 
 // ---------- Fetch Services ----------
@@ -254,21 +253,7 @@ loadServices();
     alert(data.message);
   }
 }
-  document.getElementById("notifCheckbox")
-  .addEventListener("change", async function(){
 
-    await fetch(API_BASE + "/api/user/update-notif",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        Authorization:"Bearer " + token
-      },
-      body:JSON.stringify({
-        receive_notifications: this.checked
-      })
-    });
-
-});
   async function loadResults(){
 
   const res = await fetch(API_BASE + "/api/results/my",{
