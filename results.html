@@ -95,7 +95,7 @@ h2{margin-bottom:20px;}
 </head>
 
 <body>
-
+<button onclick="goBack()">⬅ Back</button>
 <h2>📊 My Results</h2>
 
 <div id="container"></div>
@@ -137,7 +137,9 @@ async function load(){
     `;
   });
 }
-
+function goBack(){
+  window.location = "services.html";
+}
 function openResult(id){
   const r=allResults.find(x=>x.id===id);
 
