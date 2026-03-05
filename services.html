@@ -45,11 +45,15 @@ body{
 
 .topbar{
   display:flex;
-  flex-direction:column;
-  gap:18px;
-  margin-bottom:28px;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:30px;
 }
-
+.rightSide{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
 .topRow{
   display:flex;
   justify-content:space-between;
@@ -159,10 +163,25 @@ h2{
   color:white;
   transition:.25s;
 }
-
+.depositBtn:hover{
+  transform:scale(1.1);
+}
 .buyBtn:hover{
   transform:scale(1.03);
 }
+ .depositBtn{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  border:none;
+  font-size:18px;
+  font-weight:800;
+  cursor:pointer;
+  background:linear-gradient(90deg,var(--primary),var(--primary-soft));
+  color:#fff;
+  transition:.2s;
+}
+
 
 /* ===== RESULT BADGE ===== */
 
@@ -182,9 +201,29 @@ h2{
   border-radius:50%;
   display:none;
 }
+  .balanceBox{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
 
 /* ===== MOBILE ===== */
+@media(max-width:600px){
+  .topbar h2{
+    font-size:18px;
+  }
 
+  .depositBtn{
+    width:28px;
+    height:28px;
+    font-size:16px;
+  }
+
+  .balance{
+    font-size:13px;
+    padding:6px 12px;
+  }
+}
 @media (max-width:600px){
 
   .topRow{
@@ -193,9 +232,15 @@ h2{
     gap:12px;
   }
 
-  .balance{
-    align-self:flex-end;
-  }
+ .balance{
+  padding:8px 14px;
+  border-radius:20px;
+  background:rgba(59,130,246,.15);
+  border:1px solid rgba(59,130,246,.4);
+  color:var(--primary-soft);
+  font-weight:700;
+  font-size:14px;
+}
 
 }
 </style>
@@ -206,36 +251,35 @@ h2{
 
   <div class="topbar">
 
-    <div class="topRow">
-      <h2>Services</h2>
+  <h2>Services</h2>
+
+  <div class="rightSide">
+
+    <div class="balanceBox">
+      <button class="depositBtn" onclick="createDeposit()">+</button>
       <div class="balance">
-        Balance: <span id="balanceValue">0</span> UZS
+        <span id="balanceValue">0</span> UZS
       </div>
     </div>
 
-    <div class="topActions">
-
-      <button class="mainBtn" onclick="createDeposit()">
-        Deposit
+    <div class="resultWrapper">
+      <button class="secondaryBtn"
+              onclick="window.location.href='results.html'">
+        📊
       </button>
-
-      <div class="resultWrapper">
-        <button class="secondaryBtn"
-                onclick="window.location.href='results.html'">
-          📊 My Results
-        </button>
-        <span id="resultBadge"></span>
-      </div>
-
-      <button id="adminBtn"
-              class="secondaryBtn"
-              style="display:none;"
-              onclick="window.location.href='admin.html'">
-        🛠 Admin
-      </button>
-
+      <span id="resultBadge"></span>
     </div>
 
+    <button id="adminBtn"
+            class="secondaryBtn"
+            style="display:none;"
+            onclick="window.location.href='admin.html'">
+      🛠
+    </button>
+
+  </div>
+
+</div>
   </div>
 
   <div class="cards" id="servicesContainer"></div>
