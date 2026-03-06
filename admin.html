@@ -135,7 +135,30 @@ async function loadPending(){
     `;
   });
 }
+async function updateAdminNotification(){
 
+  const res = await fetch(API_BASE + "/api/results/admin/pending",{
+    headers:{
+      Authorization: "Bearer " + token
+    }
+  });
+
+  if(!res.ok) return;
+
+  const data = await res.json();
+
+  const badge = document.getElementById("adminBadge");
+
+  if(data.length > 0){
+    badge.innerText = data.length;
+    badge.style.display = "inline-block";
+  } else {
+    badge.style.display = "none";
+  }
+}
+
+updateAdminNotification();
+setInterval(updateAdminNotification, 5000);
 async function submitResult(resultId, userId, serviceId){
 
   const score = document.getElementById("score-"+resultId).value;
