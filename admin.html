@@ -2,162 +2,112 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Panel</title>
 
 <style>
 body{
   margin:0;
   font-family:system-ui;
-  background:#0f172a;
-  color:#fff;
+  background:#0b1220;
+  color:#f1f5f9;
+}
+
+.wrap{
+  max-width:1000px;
+  margin:auto;
   padding:20px;
 }
 
 h2{
-  margin-bottom:20px;
+  margin:0 0 20px 0;
+  position:relative;
+  display:inline-block;
+}
+
+#adminBadge{
+  position:absolute;
+  top:-5px;
+  right:-20px;
+  background:#ef4444;
+  color:white;
+  font-size:11px;
+  padding:3px 7px;
+  border-radius:50%;
+  display:none;
 }
 
 .card{
-  background:#111827;
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:16px;
-  border:1px solid rgba(255,255,255,.08);
-  transition:0.25s;
-}
-
-.card:hover{
-  transform:translateY(-3px);
-}
-
-input, textarea{
-  width:100%;
-  padding:10px;
-  margin-top:8px;
-  margin-bottom:10px;
-  border-radius:10px;
-  border:none;
-  outline:none;
-  font-size:14px;
-}
-
-textarea{
-  resize:none;
-  height:80px;
+  background:#16223a;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:12px;
 }
 
 button{
-  padding:10px 14px;
+  padding:6px 10px;
   border:none;
-  border-radius:10px;
+  border-radius:8px;
   cursor:pointer;
-  background:#00f5a0;
-  font-weight:bold;
-  transition:0.2s;
-}
-
-button:hover{
-  transform:scale(1.05);
-}
-
-.empty{
-  opacity:0.7;
-  margin-top:20px;
+  background:#3b82f6;
+  color:white;
 }
 </style>
 </head>
 
 <body>
-<button onclick="goBack()">⬅ Back</button>
-<h2>🛠 Admin Dashboard</h2>
+
+<div class="wrap">
+
+<h2>
+Admin Panel
+<span id="adminBadge"></span>
+</h2>
 
 <div id="pendingContainer"></div>
 
+</div>
+
 <script>
-const API_BASE = "https://beckend-bot-1.onrender.com"; // change if needed
-const token = localStorage.getItem("token");
+const API_BASE="https://beckend-bot-1.onrender.com";
+const token=localStorage.getItem("token");
 
-// 🔒 Require login
-if(!token){
-  window.location = "index.html";
-}
-function goBack(){
-  window.location = "services.html";
-}
 async function loadPending(){
-
-  const res = await fetch(API_BASE + "/api/results/admin/pending",{
-    headers:{ Authorization:"Bearer " + token }
+  const res=await fetch(API_BASE+"/api/results/admin/pending",{
+    headers:{Authorization:"Bearer "+token}
   });
+  const data=await res.json();
 
-  if(!res.ok){
-    const err = await res.json();
-    alert(err.message);
-    return;
+  pendingContainer.innerHTML="";
+  if(data.length>0){
+    adminBadge.innerText=data.length;
+    adminBadge.style.display="block";
+  }else{
+    adminBadge.style.display="none";
   }
 
-  const data = await res.json();
-  const container = document.getElementById("pendingContainer");
-  container.innerHTML = "";
-
-  if(data.length === 0){
-    container.innerHTML = "<div class='empty'>No pending tests.</div>";
-    return;
-  }
-
-  data.forEach(item=>{
-    container.innerHTML += `
+  data.forEach(r=>{
+    pendingContainer.innerHTML+=`
       <div class="card">
-        <b>User:</b> ${item.username}<br>
-        <b>Service:</b> ${item.name}<br>
-
-        <input placeholder="Score (example 7.5)" id="score-${item.id}">
-        <textarea placeholder="Feedback..." id="feedback-${item.id}"></textarea>
-
-        <button onclick="submitResult(${item.id}, ${item.user_id}, ${item.service_id})">
-          Submit Result
+        <b>${r.username}</b><br>
+        ${r.name}<br><br>
+        <button onclick="complete(${r.id})">
+        Mark Completed
         </button>
-      </div>
-    `;
+      </div>`;
   });
 }
 
-async function submitResult(resultId, userId, serviceId){
-
-  const score = document.getElementById("score-"+resultId).value;
-  const feedback = document.getElementById("feedback-"+resultId).value;
-
-  if(!score || !feedback){
-    alert("Score and feedback required");
-    return;
-  }
-
-  const res = await fetch(API_BASE + "/api/results/admin/add",{
+async function complete(id){
+  await fetch(API_BASE+"/api/results/admin/complete/"+id,{
     method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      Authorization:"Bearer " + token
-    },
-    body:JSON.stringify({
-      user_id:userId,
-      service_id:serviceId,
-      score,
-      feedback
-    })
+    headers:{Authorization:"Bearer "+token}
   });
-
-  if(!res.ok){
-    const err = await res.json();
-    alert(err.message);
-    return;
-  }
-
-  alert("✅ Result sent successfully!");
   loadPending();
 }
 
 loadPending();
+setInterval(loadPending,5000);
 </script>
-
 </body>
 </html>
