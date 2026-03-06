@@ -1,94 +1,73 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Writing Test</title>
 
 <style>
+
 body{
-margin:0;
+background:#0f172a;
+color:white;
 font-family:system-ui;
-background:#0b1220;
-color:#f1f5f9;
+margin:0;
 padding:20px;
 }
 
 .container{
-max-width:800px;
+max-width:700px;
 margin:auto;
 }
 
-h2{
-margin-bottom:20px;
-}
-
 .card{
-background:#16223a;
+background:#1e293b;
 padding:20px;
-border-radius:14px;
+border-radius:12px;
 margin-bottom:20px;
 }
 
 textarea{
 width:100%;
-min-height:120px;
-padding:10px;
-border-radius:10px;
+min-height:140px;
 border:none;
-margin-top:8px;
+border-radius:8px;
+padding:10px;
+margin-top:10px;
 background:#0f172a;
 color:white;
 }
 
-input[type=file]{
-margin-top:10px;
-}
-
 .preview{
-display:flex;
+display:grid;
+grid-template-columns:repeat(auto-fill,90px);
 gap:10px;
-flex-wrap:wrap;
 margin-top:10px;
 }
 
 .preview img{
-width:100px;
-border-radius:8px;
-}
-
-.wordCounter{
-font-size:12px;
-color:#94a3b8;
-margin-top:6px;
+width:90px;
+border-radius:6px;
 }
 
 button{
-padding:10px 18px;
+width:100%;
+padding:12px;
+background:#22c55e;
 border:none;
 border-radius:10px;
+font-size:16px;
 cursor:pointer;
-background:#3b82f6;
-color:white;
-font-weight:600;
-margin-top:15px;
+margin-top:20px;
 }
 
-.progress{
-width:100%;
-background:#0f172a;
-border-radius:8px;
-overflow:hidden;
-margin-top:10px;
-display:none;
+.counter{
+font-size:13px;
+opacity:.7;
+margin-top:5px;
 }
 
-.progressBar{
-height:8px;
-width:0%;
-background:#22c55e;
-}
 </style>
+
 </head>
 
 <body>
@@ -100,36 +79,38 @@ background:#22c55e;
 <div class="card">
 
 <label>Essay Topic</label>
-<textarea id="topicText" placeholder="Write essay topic..."></textarea>
+
+<textarea id="topicText"></textarea>
 
 <label>Or Upload Topic Photo</label>
-<input type="file" id="topicImage" accept="image/*">
 
-<div class="preview" id="topicPreview"></div>
+<input type="file" id="topicImage">
+
+<div id="topicPreview" class="preview"></div>
 
 </div>
 
 <div class="card">
 
 <label>Your Essay</label>
-<textarea id="essayText" placeholder="Write your essay here..."></textarea>
 
-<div class="wordCounter">
+<textarea id="essayText"></textarea>
+
+<div class="counter">
 Words: <span id="wordCount">0</span>
 </div>
 
-<label>Or Upload Essay Photos</label>
-<input type="file" id="essayImages" accept="image/*" multiple>
+<label>Upload Essay Photos</label>
 
-<div class="preview" id="essayPreview"></div>
+<input type="file" id="essayImages" multiple>
+
+<div id="essayPreview" class="preview"></div>
 
 </div>
 
-<div class="progress">
-<div class="progressBar" id="progressBar"></div>
-</div>
-
-<button onclick="submitEssay()">Submit Test</button>
+<button onclick="submitEssay()">
+Submit Essay
+</button>
 
 </div>
 
@@ -138,100 +119,67 @@ Words: <span id="wordCount">0</span>
 const API_BASE="https://beckend-bot-1.onrender.com";
 const token=localStorage.getItem("token");
 
-const urlParams=new URLSearchParams(window.location.search);
-const RESULT_ID=urlParams.get("result_id");
+const params=new URLSearchParams(window.location.search);
+const RESULT_ID=params.get("result_id");
 
-/* WORD COUNTER */
-
-const essayText=document.getElementById("essayText");
-const wordCount=document.getElementById("wordCount");
-
-essayText.addEventListener("input",()=>{
-const words=essayText.value.trim().split(/\s+/).filter(Boolean);
-wordCount.innerText=words.length;
-});
-
-/* IMAGE PREVIEW */
-
-function previewImages(input,container){
-
-container.innerHTML="";
-
-[...input.files].forEach(file=>{
-const reader=new FileReader();
-
-reader.onload=e=>{
-const img=document.createElement("img");
-img.src=e.target.result;
-container.appendChild(img);
+essayText.oninput=()=>{
+ const words=essayText.value.trim().split(/\s+/).filter(Boolean);
+ wordCount.innerText=words.length;
 };
 
-reader.readAsDataURL(file);
+function preview(input,box){
+
+box.innerHTML="";
+
+[...input.files].forEach(file=>{
+
+ const reader=new FileReader();
+
+ reader.onload=e=>{
+   const img=document.createElement("img");
+   img.src=e.target.result;
+   box.appendChild(img);
+ };
+
+ reader.readAsDataURL(file);
+
 });
+
 }
 
-topicImage.onchange=()=>previewImages(topicImage,topicPreview);
-essayImages.onchange=()=>previewImages(essayImages,essayPreview);
-
-/* SUBMIT */
+topicImage.onchange=()=>preview(topicImage,topicPreview);
+essayImages.onchange=()=>preview(essayImages,essayPreview);
 
 async function submitEssay(){
 
-const topicTextVal=document.getElementById("topicText").value;
-const essayTextVal=document.getElementById("essayText").value;
+ const formData=new FormData();
 
-const formData=new FormData();
+ formData.append("result_id",RESULT_ID);
+ formData.append("topic_text",topicText.value);
+ formData.append("essay_text",essayText.value);
 
-formData.append("result_id",RESULT_ID);
-formData.append("topic_text",topicTextVal);
-formData.append("essay_text",essayTextVal);
+ if(topicImage.files[0]){
+  formData.append("topic_image",topicImage.files[0]);
+ }
 
-if(topicImage.files[0]){
-formData.append("topic_image",topicImage.files[0]);
-}
+ [...essayImages.files].forEach(file=>{
+  formData.append("essay_images",file);
+ });
 
-[...essayImages.files].forEach(file=>{
-formData.append("essay_images",file);
-});
+ const res=await fetch(API_BASE+"/api/results/submit-writing",{
+  method:"POST",
+  headers:{
+   Authorization:"Bearer "+token
+  },
+  body:formData
+ });
 
-const progress=document.querySelector(".progress");
-const progressBar=document.getElementById("progressBar");
-
-progress.style.display="block";
-
-const xhr=new XMLHttpRequest();
-
-xhr.open("POST",API_BASE+"/api/results/submit-writing");
-
-xhr.setRequestHeader("Authorization","Bearer "+token);
-
-xhr.upload.onprogress=function(e){
-
-if(e.lengthComputable){
-
-const percent=(e.loaded/e.total)*100;
-progressBar.style.width=percent+"%";
-
-}
-
-};
-
-xhr.onload=function(){
-
-if(xhr.status===200){
-
-alert("Essay submitted successfully!");
-window.location="services.html";
-
-}else{
-
-alert("Submission failed");
-
-}
-
-};
-
-xhr.send(formData);
+ if(res.ok){
+  alert("Submitted!");
+  window.location="services.html";
+ }else{
+  alert("Submission failed");
+ }
 
 }
 
