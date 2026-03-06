@@ -69,7 +69,21 @@ button:hover{
 
 <body>
 <button onclick="goBack()">⬅ Back</button>
-<h2>🛠 Admin Dashboard</h2>
+<h2 style="position:relative; display:inline-block;">
+  Admin Panel
+  <span id="adminBadge"
+        style="
+          position:absolute;
+          top:-6px;
+          right:-18px;
+          background:red;
+          color:white;
+          font-size:11px;
+          padding:3px 7px;
+          border-radius:50%;
+          display:none;">
+  </span>
+</h2>
 
 <div id="pendingContainer"></div>
 
@@ -131,7 +145,28 @@ async function submitResult(resultId, userId, serviceId){
     alert("Score and feedback required");
     return;
   }
+async function checkAdminBadge(){
 
+  const res = await fetch(API_BASE + "/api/results/admin/pending",{
+    headers:{ Authorization:"Bearer " + token }
+  });
+
+  if(!res.ok) return;
+
+  const data = await res.json();
+
+  const badge = document.getElementById("adminBadge");
+
+  if(data.length > 0){
+    badge.innerText = data.length;
+    badge.style.display = "inline-block";
+  }else{
+    badge.style.display = "none";
+  }
+}
+
+checkAdminBadge();
+setInterval(checkAdminBadge, 5000);
   const res = await fetch(API_BASE + "/api/results/admin/add",{
     method:"POST",
     headers:{
