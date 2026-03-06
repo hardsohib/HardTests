@@ -332,8 +332,17 @@ async function purchaseService(service){
   const data = await res.json();
 
   if(res.ok){
-    alert("Purchase successful!");
-    loadProfile();
+   if(service.service_type === "text"){
+
+window.location =
+"writing-test.html?result_id=" + data.result_id;
+
+}else{
+
+alert("Purchase successful!");
+loadProfile();
+
+}
     checkPendingResults();
   }else{
     alert(data.message || "Not enough balance.");
