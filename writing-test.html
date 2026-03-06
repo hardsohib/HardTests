@@ -115,17 +115,23 @@ Submit Essay
 </div>
 
 <script>
-
+const topicText = document.getElementById("topicText");
+const essayText = document.getElementById("essayText");
+const topicImage = document.getElementById("topicImage");
+const essayImages = document.getElementById("essayImages");
+const topicPreview = document.getElementById("topicPreview");
+const essayPreview = document.getElementById("essayPreview");
+const wordCount = document.getElementById("wordCount");
 const API_BASE="https://beckend-bot-1.onrender.com";
 const token=localStorage.getItem("token");
 
 const params=new URLSearchParams(window.location.search);
 const RESULT_ID=params.get("result_id");
 
-essayText.oninput=()=>{
- const words=essayText.value.trim().split(/\s+/).filter(Boolean);
- wordCount.innerText=words.length;
-};
+essayText.addEventListener("input", () => {
+  const words = essayText.value.trim().split(/\s+/).filter(Boolean);
+  wordCount.innerText = words.length;
+});
 
 function preview(input,box){
 
@@ -182,7 +188,10 @@ async function submitEssay(){
  }
 
 }
-
+if (!RESULT_ID) {
+  alert("Result ID missing");
+  return;
+}
 </script>
 
 </body>
