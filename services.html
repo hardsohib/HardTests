@@ -1,8 +1,8 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Services</title>
 
 <style>
@@ -15,13 +15,17 @@
   --danger:#ef4444;
   --text:#f1f5f9;
   --muted:#94a3b8;
+  --radius:18px;
 }
+
+*{box-sizing:border-box}
 
 body{
   margin:0;
-  font-family:system-ui;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
   background:var(--bg);
   color:var(--text);
+  min-height:100vh;
 }
 
 .wrap{
@@ -30,36 +34,55 @@ body{
   padding:18px;
 }
 
+/* ===== TOPBAR ===== */
+
 .topbar{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:25px;
+  margin-bottom:28px;
+  flex-wrap:wrap;
+  gap:15px;
 }
 
 .leftSide{
   display:flex;
   align-items:center;
   gap:12px;
+  flex-wrap:wrap;
 }
 
-h2{margin:0;font-size:22px;}
+h2{
+  margin:0;
+  font-size:22px;
+  font-weight:800;
+}
 
 .iconBtn{
-  padding:7px 12px;
+  padding:8px 14px;
   border-radius:14px;
   border:1px solid rgba(255,255,255,.1);
   background:transparent;
   color:var(--muted);
+  font-size:13px;
   cursor:pointer;
+  transition:.25s;
 }
 
 .iconBtn:hover{
   background:rgba(255,255,255,.05);
-  color:white;
+  color:#fff;
 }
 
+/* ===== RIGHT SIDE ===== */
+
 .rightSide{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.balanceBox{
   display:flex;
   align-items:center;
   gap:6px;
@@ -71,9 +94,15 @@ h2{margin:0;font-size:22px;}
   border-radius:50%;
   border:none;
   font-size:18px;
+  font-weight:800;
   cursor:pointer;
   background:linear-gradient(90deg,var(--primary),var(--primary-soft));
-  color:white;
+  color:#fff;
+  transition:.2s;
+}
+
+.depositBtn:hover{
+  transform:scale(1.1);
 }
 
 .balance{
@@ -82,8 +111,11 @@ h2{margin:0;font-size:22px;}
   background:rgba(59,130,246,.15);
   border:1px solid rgba(59,130,246,.4);
   color:var(--primary-soft);
-  font-weight:600;
+  font-weight:700;
+  font-size:14px;
 }
+
+/* ===== SERVICES ===== */
 
 .cards{
   display:grid;
@@ -93,164 +125,268 @@ h2{margin:0;font-size:22px;}
 
 .tile{
   background:linear-gradient(145deg,var(--card),var(--card2));
-  padding:20px;
-  border-radius:18px;
+  padding:22px;
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,.05);
   display:flex;
   flex-direction:column;
   justify-content:space-between;
+  min-height:190px;
+  transition:.3s;
+}
+
+.tile:hover{
+  transform:translateY(-4px);
+  box-shadow:0 18px 40px rgba(0,0,0,.6);
+}
+
+.title{
+  font-size:18px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.sub{
+  font-size:14px;
+  color:var(--muted);
+  margin-bottom:18px;
 }
 
 .buyBtn{
-  margin-top:15px;
-  padding:10px;
+  padding:12px;
   border:none;
-  border-radius:12px;
+  border-radius:14px;
+  font-weight:700;
   cursor:pointer;
   background:linear-gradient(90deg,var(--primary),var(--primary-soft));
   color:white;
+  transition:.25s;
 }
 
-.resultWrapper{position:relative;}
+.buyBtn:hover{
+  transform:scale(1.03);
+}
+
+/* ===== RESULT BADGE ===== */
+
+.resultWrapper{
+  position:relative;
+  display:inline-block;
+}
 
 #resultBadge{
   position:absolute;
   top:-6px;
   right:-6px;
   background:var(--danger);
-  color:white;
+  color:#fff;
   font-size:11px;
   padding:3px 7px;
   border-radius:50%;
   display:none;
 }
+
+/* ===== MOBILE ===== */
+
+@media(max-width:600px){
+
+  h2{font-size:18px;}
+
+  .topbar{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .rightSide{
+    align-self:flex-end;
+  }
+
+  .depositBtn{
+    width:28px;
+    height:28px;
+    font-size:16px;
+  }
+
+  .balance{
+    font-size:13px;
+    padding:6px 12px;
+  }
+}
 </style>
 </head>
-
 <body>
 
 <div class="wrap">
 
-<div class="topbar">
+  <div class="topbar">
 
-  <div class="leftSide">
-    <h2>Services</h2>
+    <div class="leftSide">
+      <h2>Services</h2>
 
-    <div class="resultWrapper">
-      <button class="iconBtn"
-              onclick="window.location='results.html'">
-        📊 My Results
+      <div class="resultWrapper">
+        <button class="iconBtn"
+                onclick="window.location.href='results.html'">
+          📊 My Results
+        </button>
+        <span id="resultBadge"></span>
+      </div>
+
+      <button id="adminBtn"
+              class="iconBtn"
+              style="display:none;"
+              onclick="window.location.href='admin.html'">
+        🛠 Admin Panel
       </button>
-      <span id="resultBadge"></span>
     </div>
 
-    <button id="adminBtn"
-            class="iconBtn"
-            style="display:none;"
-            onclick="window.location='admin.html'">
-      🛠 Admin
-    </button>
-  </div>
-
-  <div class="rightSide">
-    <button class="depositBtn" onclick="createDeposit()">+</button>
-    <div class="balance">
-      <span id="balanceValue">0</span> UZS
+    <div class="rightSide">
+      <div class="balanceBox">
+        <button class="depositBtn" onclick="createDeposit()">+</button>
+        <div class="balance">
+          <span id="balanceValue">0</span> UZS
+        </div>
+      </div>
     </div>
+
   </div>
 
-</div>
-
-<div class="cards" id="servicesContainer"></div>
+  <div class="cards" id="servicesContainer"></div>
 
 </div>
 
 <script>
-const API_BASE="https://beckend-bot-1.onrender.com";
-const token=localStorage.getItem("token");
-if(!token) location.replace("index.html");
+const API_BASE = "https://beckend-bot-1.onrender.com";
+const token = localStorage.getItem("token");
+
+if(!token){
+  window.location.replace("./index.html");
+}
 
 async function loadProfile(){
-  const res=await fetch(API_BASE+"/api/user/me",{
-    headers:{Authorization:"Bearer "+token}
+  const res = await fetch(API_BASE + "/api/user/me",{
+    headers:{ Authorization:"Bearer " + token }
   });
-  const user=await res.json();
-  balanceValue.innerText=user.balance;
-  if(user.is_admin){
-    adminBtn.style.display="inline-block";
+  const data = await res.json();
+
+  document.getElementById("balanceValue").innerText =
+    Number(data.balance).toLocaleString("en-US");
+
+  if(data.is_admin){
+    document.getElementById("adminBtn").style.display="inline-block";
   }
 }
 
 async function loadServices(){
-  const res=await fetch(API_BASE+"/api/services",{
-    headers:{Authorization:"Bearer "+token}
+  const res = await fetch(API_BASE + "/api/services",{
+    headers:{ Authorization:"Bearer " + token }
   });
-  const services=await res.json();
-  servicesContainer.innerHTML="";
-  services.forEach(s=>{
-    servicesContainer.innerHTML+=`
-      <div class="tile">
-        <div>
-          <h3>${s.name}</h3>
-          <p>${s.description||""}</p>
-        </div>
-        <button class="buyBtn"
-        onclick="purchase(${s.id},${s.price},'${s.name}')">
-        ${s.price} UZS
-        </button>
-      </div>`;
+
+  const services = await res.json();
+  const container = document.getElementById("servicesContainer");
+  container.innerHTML="";
+
+  services.forEach(service=>{
+    const div=document.createElement("div");
+    div.className="tile";
+    div.innerHTML=`
+      <div>
+        <div class="title">${service.name}</div>
+        <div class="sub">${service.description||""}</div>
+      </div>
+      <button class="buyBtn">
+        ${Number(service.price).toLocaleString("en-US")} UZS
+      </button>
+    `;
+
+    div.querySelector(".buyBtn").addEventListener("click",()=>{
+      purchaseService(service);
+    });
+
+    container.appendChild(div);
   });
 }
 
-async function purchase(id,price,name){
-  if(!confirm("Buy "+name+"?"))return;
-  const res=await fetch(API_BASE+"/api/services/purchase",{
+async function purchaseService(service){
+
+  if(service.requires_horizontal){
+    if(window.innerHeight > window.innerWidth){
+      alert("Please rotate your phone horizontally.");
+      return;
+    }
+  }
+
+  const confirmBuy = confirm(
+    `Buy "${service.name}" for ${service.price} UZS?`
+  );
+  if(!confirmBuy) return;
+
+  const res = await fetch(API_BASE + "/api/services/purchase",{
     method:"POST",
     headers:{
       "Content-Type":"application/json",
-      Authorization:"Bearer "+token
+      Authorization:"Bearer " + token
     },
-    body:JSON.stringify({service_id:id})
+    body:JSON.stringify({ service_id:service.id })
   });
-  if(res.ok){
-    alert("Purchased!");
-    loadProfile();
-    checkPending();
-  }
-}
 
-async function checkPending(){
-  const res=await fetch(API_BASE+"/api/results/my",{
-    headers:{Authorization:"Bearer "+token}
-  });
-  const data=await res.json();
-  const pending=data.filter(r=>r.status==="pending").length;
-  if(pending>0){
-    resultBadge.innerText=pending;
-    resultBadge.style.display="block";
+  const data = await res.json();
+
+  if(res.ok){
+    alert("Purchase successful!");
+    loadProfile();
+    checkPendingResults();
   }else{
-    resultBadge.style.display="none";
+    alert(data.message || "Not enough balance.");
   }
 }
 
 async function createDeposit(){
-  const amount=prompt("Amount?");
-  if(!amount)return;
-  const res=await fetch(API_BASE+"/api/deposit/create",{
+  const amount = prompt("Enter deposit amount (UZS)");
+  if(!amount) return;
+
+  const res = await fetch(API_BASE + "/api/deposit/create",{
     method:"POST",
     headers:{
       "Content-Type":"application/json",
-      Authorization:"Bearer "+token
+      Authorization:"Bearer " + token
     },
-    body:JSON.stringify({amount:Number(amount)})
+    body:JSON.stringify({ amount:Number(amount) })
   });
-  const data=await res.json();
-  await fetch(API_BASE+"/api/deposit/confirm/"+data.transaction_id,{method:"POST"});
-  loadProfile();
+
+  const data = await res.json();
+
+  if(res.ok){
+    await fetch(API_BASE + "/api/deposit/confirm/" + data.transaction_id,{
+      method:"POST"
+    });
+    alert("Deposit confirmed!");
+    loadProfile();
+  }else{
+    alert(data.message);
+  }
+}
+
+async function checkPendingResults(){
+  const res = await fetch(API_BASE + "/api/results/my",{
+    headers:{ Authorization:"Bearer " + token }
+  });
+  const data = await res.json();
+
+  const pending = data.filter(r=>r.status==="pending").length;
+  const badge = document.getElementById("resultBadge");
+
+  if(pending>0){
+    badge.innerText=pending;
+    badge.style.display="block";
+  }else{
+    badge.style.display="none";
+  }
 }
 
 loadProfile();
 loadServices();
-checkPending();
+checkPendingResults();
 </script>
+
 </body>
 </html>
