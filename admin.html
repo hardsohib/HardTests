@@ -5,216 +5,283 @@
 <title>Admin Panel</title>
 
 <style>
+
 body{
-  margin:0;
-  font-family:system-ui;
-  background:#0f172a;
-  color:#fff;
-  padding:20px;
+margin:0;
+font-family:system-ui;
+background:#0f172a;
+color:white;
+padding:20px;
+}
+
+.top{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:20px;
 }
 
 h2{
-  margin-bottom:20px;
+margin:0;
+position:relative;
+}
+
+#adminBadge{
+position:absolute;
+top:-6px;
+right:-18px;
+background:red;
+color:white;
+font-size:11px;
+padding:3px 7px;
+border-radius:50%;
+display:none;
 }
 
 .card{
-  background:#111827;
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:16px;
-  border:1px solid rgba(255,255,255,.08);
-  transition:0.25s;
+background:#111827;
+border-radius:14px;
+padding:18px;
+margin-bottom:20px;
+border:1px solid rgba(255,255,255,.08);
 }
 
-.card:hover{
-  transform:translateY(-3px);
+.section{
+margin-top:10px;
 }
 
-input, textarea{
-  width:100%;
-  padding:10px;
-  margin-top:8px;
-  margin-bottom:10px;
-  border-radius:10px;
-  border:none;
-  outline:none;
-  font-size:14px;
+.preview{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:8px;
 }
 
-textarea{
-  resize:none;
-  height:80px;
+.preview img{
+width:120px;
+border-radius:6px;
+cursor:pointer;
+}
+
+textarea,input{
+width:100%;
+padding:10px;
+border-radius:10px;
+border:none;
+margin-top:8px;
+background:#0f172a;
+color:white;
 }
 
 button{
-  padding:10px 14px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  background:#00f5a0;
-  font-weight:bold;
-  transition:0.2s;
+padding:10px 16px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:#00f5a0;
+font-weight:bold;
+margin-top:10px;
 }
 
 button:hover{
-  transform:scale(1.05);
+transform:scale(1.05);
 }
 
 .empty{
-  opacity:0.7;
-  margin-top:20px;
+opacity:.7;
+margin-top:20px;
 }
+
+.back{
+background:#1f2937;
+color:white;
+}
+
 </style>
 </head>
 
 <body>
-<button onclick="goBack()">⬅ Back</button>
-<h2 style="position:relative; display:inline-block;">
-  Admin Panel
-  <span id="adminBadge"
-        style="
-          position:absolute;
-          top:-6px;
-          right:-18px;
-          background:red;
-          color:white;
-          font-size:11px;
-          padding:3px 7px;
-          border-radius:50%;
-          display:none;">
-  </span>
+
+<div class="top">
+
+<button class="back" onclick="goBack()">⬅ Back</button>
+
+<h2>
+Admin Panel
+<span id="adminBadge"></span>
 </h2>
+
+</div>
 
 <div id="pendingContainer"></div>
 
 <script>
-const API_BASE = "https://beckend-bot-1.onrender.com"; // change if needed
-const token = localStorage.getItem("token");
 
-// 🔒 Require login
+const API_BASE="https://beckend-bot-1.onrender.com";
+const token=localStorage.getItem("token");
+
 if(!token){
-  window.location = "index.html";
+window.location="index.html";
 }
+
 function goBack(){
-  window.location = "services.html";
+window.location="services.html";
 }
+
+/* LOAD PENDING TESTS */
+
 async function loadPending(){
 
-  const res = await fetch(API_BASE + "/api/results/admin/pending",{
-    headers:{ Authorization:"Bearer " + token }
-  });
+const res=await fetch(API_BASE+"/api/results/admin/pending",{
+headers:{Authorization:"Bearer "+token}
+});
 
-  if(!res.ok){
-    const err = await res.json();
-    alert(err.message);
-    return;
-  }
-
-  const data = await res.json();
-  const container = document.getElementById("pendingContainer");
-  container.innerHTML = "";
-
-  if(data.length === 0){
-    container.innerHTML = "<div class='empty'>No pending tests.</div>";
-    return;
-  }
-
-  data.forEach(item=>{
-    container.innerHTML += `
-      <div class="card">
-        <b>User:</b> ${item.username}<br>
-        <b>Service:</b> ${item.name}<br>
-
-        <input placeholder="Score (example 7.5)" id="score-${item.id}">
-        <textarea placeholder="Feedback..." id="feedback-${item.id}"></textarea>
-
-        <button onclick="submitResult(${item.id}, ${item.user_id}, ${item.service_id})">
-          Submit Result
-        </button>
-      </div>
-    `;
-  });
-}
-async function updateAdminNotification(){
-
-  const res = await fetch(API_BASE + "/api/results/admin/pending",{
-    headers:{
-      Authorization: "Bearer " + token
-    }
-  });
-
-  if(!res.ok) return;
-
-  const data = await res.json();
-
-  const badge = document.getElementById("adminBadge");
-
-  if(data.length > 0){
-    badge.innerText = data.length;
-    badge.style.display = "inline-block";
-  } else {
-    badge.style.display = "none";
-  }
+if(!res.ok){
+alert("Failed to load results");
+return;
 }
 
-updateAdminNotification();
-setInterval(updateAdminNotification, 5000);
-async function submitResult(resultId, userId, serviceId){
+const data=await res.json();
+const container=document.getElementById("pendingContainer");
 
-  const score = document.getElementById("score-"+resultId).value;
-  const feedback = document.getElementById("feedback-"+resultId).value;
+container.innerHTML="";
 
-  if(!score || !feedback){
-    alert("Score and feedback required");
-    return;
-  }
-async function checkAdminBadge(){
-
-  const res = await fetch(API_BASE + "/api/results/admin/pending",{
-    headers:{ Authorization:"Bearer " + token }
-  });
-
-  if(!res.ok) return;
-
-  const data = await res.json();
-
-  const badge = document.getElementById("adminBadge");
-
-  if(data.length > 0){
-    badge.innerText = data.length;
-    badge.style.display = "inline-block";
-  }else{
-    badge.style.display = "none";
-  }
+if(data.length===0){
+container.innerHTML="<div class='empty'>No pending tests.</div>";
+return;
 }
 
-checkAdminBadge();
-setInterval(checkAdminBadge, 5000);
-  const res = await fetch(API_BASE + "/api/results/admin/add",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      Authorization:"Bearer " + token
-    },
-    body:JSON.stringify({
-      user_id:userId,
-      service_id:serviceId,
-      score,
-      feedback
-    })
-  });
+data.forEach(item=>{
 
-  if(!res.ok){
-    const err = await res.json();
-    alert(err.message);
-    return;
-  }
+let topicImageHTML="";
+let essayImagesHTML="";
 
-  alert("✅ Result sent successfully!");
-  loadPending();
+/* Topic Image */
+
+if(item.topic_image){
+topicImageHTML=`
+<div class="section">
+<b>Topic Image</b>
+<div class="preview">
+<img src="${API_BASE}/uploads/${item.topic_image}">
+</div>
+</div>`;
+}
+
+/* Essay Images */
+
+if(item.essay_images && item.essay_images.length>0){
+
+essayImagesHTML="<div class='section'><b>Essay Images</b><div class='preview'>";
+
+item.essay_images.forEach(img=>{
+essayImagesHTML+=`<img src="${API_BASE}/uploads/${img}">`;
+});
+
+essayImagesHTML+="</div></div>";
+}
+
+container.innerHTML+=`
+
+<div class="card">
+
+<b>User:</b> ${item.username}<br>
+<b>Service:</b> ${item.name}<br>
+
+<div class="section">
+<b>Topic Text</b>
+<div>${item.topic_text || "—"}</div>
+</div>
+
+${topicImageHTML}
+
+<div class="section">
+<b>Essay Text</b>
+<div style="white-space:pre-wrap">${item.essay_text || "—"}</div>
+</div>
+
+${essayImagesHTML}
+
+<div class="section">
+<input placeholder="Score (example 7.5)" id="score-${item.id}">
+<textarea placeholder="Feedback..." id="feedback-${item.id}"></textarea>
+
+<button onclick="submitResult(${item.id},${item.user_id},${item.service_id})">
+Submit Result
+</button>
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+/* SUBMIT RESULT */
+
+async function submitResult(resultId,userId,serviceId){
+
+const score=document.getElementById("score-"+resultId).value;
+const feedback=document.getElementById("feedback-"+resultId).value;
+
+if(!score || !feedback){
+alert("Score and feedback required");
+return;
+}
+
+const res=await fetch(API_BASE+"/api/results/admin/add",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+Authorization:"Bearer "+token
+},
+body:JSON.stringify({
+user_id:userId,
+service_id:serviceId,
+score,
+feedback
+})
+});
+
+if(!res.ok){
+alert("Failed to submit");
+return;
+}
+
+alert("✅ Result sent!");
+loadPending();
+updateBadge();
+
+}
+
+/* ADMIN NOTIFICATION BADGE */
+
+async function updateBadge(){
+
+const res=await fetch(API_BASE+"/api/results/admin/pending",{
+headers:{Authorization:"Bearer "+token}
+});
+
+if(!res.ok) return;
+
+const data=await res.json();
+const badge=document.getElementById("adminBadge");
+
+if(data.length>0){
+badge.innerText=data.length;
+badge.style.display="inline-block";
+}else{
+badge.style.display="none";
+}
+
 }
 
 loadPending();
+updateBadge();
+setInterval(updateBadge,5000);
+
 </script>
 
 </body>
