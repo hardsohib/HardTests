@@ -60,6 +60,11 @@ cursor:pointer;
 margin-top:20px;
 }
 
+button:disabled{
+opacity:.6;
+cursor:not-allowed;
+}
+
 .counter{
 font-size:13px;
 opacity:.7;
@@ -79,21 +84,19 @@ margin-top:5px;
 <div class="card">
 
 <label>Essay Topic</label>
-
 <textarea id="topicText"></textarea>
 
 <label>Or Upload Topic Photo</label>
-
 <input type="file" id="topicImage">
 
 <div id="topicPreview" class="preview"></div>
 
 </div>
 
+
 <div class="card">
 
 <label>Your Essay</label>
-
 <textarea id="essayText"></textarea>
 
 <div class="counter">
@@ -101,12 +104,12 @@ Words: <span id="wordCount">0</span>
 </div>
 
 <label>Upload Essay Photos</label>
-
 <input type="file" id="essayImages" multiple>
 
 <div id="essayPreview" class="preview"></div>
 
 </div>
+
 
 <button id="submitBtn" onclick="submitEssay()">
 Submit Essay
@@ -114,52 +117,87 @@ Submit Essay
 
 </div>
 
+
 <script>
-  if(!token){
-  window.location="index.html";
+
+const API_BASE="https://beckend-bot-1.onrender.com";
+const token=localStorage.getItem("token");
+
+const params = new URLSearchParams(window.location.search);
+const RESULT_ID = params.get("result_id");
+
+if(!token){
+ window.location="index.html";
 }
+
+if(!RESULT_ID){
+ alert("Result ID missing");
+ window.location="services.html";
+}
+
+/* DOM */
+
 const topicText = document.getElementById("topicText");
 const essayText = document.getElementById("essayText");
 const topicImage = document.getElementById("topicImage");
 const essayImages = document.getElementById("essayImages");
+
 const topicPreview = document.getElementById("topicPreview");
 const essayPreview = document.getElementById("essayPreview");
+
 const wordCount = document.getElementById("wordCount");
-const API_BASE="https://beckend-bot-1.onrender.com";
-const token=localStorage.getItem("token");
+const submitBtn = document.getElementById("submitBtn");
 
-const params=new URLSearchParams(window.location.search);
-const RESULT_ID=params.get("result_id");
 
-essayText.addEventListener("input", () => {
-  const words = essayText.value.trim().split(/\s+/).filter(Boolean);
-  wordCount.innerText = words.length;
+/* Word Counter */
+
+essayText.addEventListener("input", ()=>{
+
+ const words = essayText.value
+  .trim()
+  .split(/\s+/)
+  .filter(Boolean);
+
+ wordCount.innerText = words.length;
+
 });
 
-function preview(input,box){
 
-box.innerHTML="";
+/* Image Preview */
 
-[...input.files].forEach(file=>{
+function preview(input, box){
 
- const reader=new FileReader();
+ box.innerHTML="";
 
- reader.onload=e=>{
-   const img=document.createElement("img");
-   img.src=e.target.result;
+ [...input.files].forEach(file=>{
+
+  const reader = new FileReader();
+
+  reader.onload = e => {
+
+   const img = document.createElement("img");
+   img.src = e.target.result;
+
    box.appendChild(img);
- };
 
- reader.readAsDataURL(file);
+  };
 
-});
+  reader.readAsDataURL(file);
+
+ });
 
 }
 
-topicImage.onchange=()=>preview(topicImage,topicPreview);
-essayImages.onchange=()=>preview(essayImages,essayPreview);
+topicImage.onchange = () => preview(topicImage, topicPreview);
+essayImages.onchange = () => preview(essayImages, essayPreview);
+
+
+/* Submit Essay */
 
 async function submitEssay(){
+
+ submitBtn.disabled = true;
+ submitBtn.innerText = "Submitting...";
 
  const formData = new FormData();
 
@@ -168,49 +206,49 @@ async function submitEssay(){
  formData.append("essay_text", essayText.value);
 
  if(topicImage.files.length > 0){
-   formData.append("topic_image", topicImage.files[0]);
+  formData.append("topic_image", topicImage.files[0]);
  }
 
  for(const file of essayImages.files){
-   formData.append("essay_images", file);
+  formData.append("essay_images", file);
  }
 
  try{
 
-   const res = await fetch(API_BASE + "/api/results/submit-writing",{
-     method:"POST",
-     headers:{
-       Authorization:"Bearer " + token
-     },
-     body: formData
-   });
-const btn = document.getElementById("submitBtn");
-btn.disabled = true;
-btn.innerText = "Submitting...";
-   
-   const data = await res.json();
+  const res = await fetch(API_BASE + "/api/results/submit-writing",{
+   method:"POST",
+   headers:{
+    Authorization:"Bearer " + token
+   },
+   body:formData
+  });
 
-   if(!res.ok){
-     alert(data.message || "Submission failed");
-     return;
-   }
+  const data = await res.json();
 
-   alert("✅ Essay submitted successfully!");
+  if(!res.ok){
+   alert(data.message || "Submission failed");
+   submitBtn.disabled = false;
+   submitBtn.innerText = "Submit Essay";
+   return;
+  }
 
-   window.location = "services.html";
+  alert("✅ Essay submitted successfully!");
+
+  window.location = "services.html";
 
  }catch(err){
 
-   console.error(err);
-   alert("Network error");
+  console.error(err);
+
+  alert("Network error");
+
+  submitBtn.disabled = false;
+  submitBtn.innerText = "Submit Essay";
 
  }
 
 }
-if (!RESULT_ID) {
-  alert("Result ID missing");
-  window.location = "services.html";
-}
+
 </script>
 
 </body>
