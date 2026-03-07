@@ -108,13 +108,16 @@ Words: <span id="wordCount">0</span>
 
 </div>
 
-<button onclick="submitEssay()">
+<button id="submitBtn" onclick="submitEssay()">
 Submit Essay
 </button>
 
 </div>
 
 <script>
+  if(!token){
+  window.location="index.html";
+}
 const topicText = document.getElementById("topicText");
 const essayText = document.getElementById("essayText");
 const topicImage = document.getElementById("topicImage");
@@ -158,39 +161,55 @@ essayImages.onchange=()=>preview(essayImages,essayPreview);
 
 async function submitEssay(){
 
- const formData=new FormData();
+ const formData = new FormData();
 
- formData.append("result_id",RESULT_ID);
- formData.append("topic_text",topicText.value);
- formData.append("essay_text",essayText.value);
+ formData.append("result_id", RESULT_ID);
+ formData.append("topic_text", topicText.value);
+ formData.append("essay_text", essayText.value);
 
- if(topicImage.files[0]){
-  formData.append("topic_image",topicImage.files[0]);
+ if(topicImage.files.length > 0){
+   formData.append("topic_image", topicImage.files[0]);
  }
 
- [...essayImages.files].forEach(file=>{
-  formData.append("essay_images",file);
- });
+ for(const file of essayImages.files){
+   formData.append("essay_images", file);
+ }
 
- const res=await fetch(API_BASE+"/api/results/submit-writing",{
-  method:"POST",
-  headers:{
-   Authorization:"Bearer "+token
-  },
-  body:formData
- });
+ try{
 
- if(res.ok){
-  alert("Submitted!");
-  window.location="services.html";
- }else{
-  alert("Submission failed");
+   const res = await fetch(API_BASE + "/api/results/submit-writing",{
+     method:"POST",
+     headers:{
+       Authorization:"Bearer " + token
+     },
+     body: formData
+   });
+const btn = document.getElementById("submitBtn");
+btn.disabled = true;
+btn.innerText = "Submitting...";
+   
+   const data = await res.json();
+
+   if(!res.ok){
+     alert(data.message || "Submission failed");
+     return;
+   }
+
+   alert("✅ Essay submitted successfully!");
+
+   window.location = "services.html";
+
+ }catch(err){
+
+   console.error(err);
+   alert("Network error");
+
  }
 
 }
 if (!RESULT_ID) {
   alert("Result ID missing");
-  return;
+  window.location = "services.html";
 }
 </script>
 
